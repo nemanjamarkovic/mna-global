@@ -1,0 +1,63 @@
+:root {
+  /* Colors — ecology theme: light blue + green */
+  --color-primary: #3b82a8;
+  --color-primary-dark: #2d6a8a;
+  --color-primary-light: #e8f4fc;
+  --color-accent: #4caf50;
+  --color-accent-dark: #2e7d32;
+  --color-accent-light: #e8f5e9;
+
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-text-inverse: #ffffff;
+
+  --color-surface: #ffffff;
+  --color-bg: #f8fafc;
+  --color-border: #e2e8f0;
+
+  /* Typography */
+  --font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+  --font-size-4xl: 2.5rem;
+
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.75;
+
+  /* Spacing */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  --space-4xl: 6rem;
+
+  /* Layout */
+  --container-max: 1200px;
+  --header-height: 72px;
+
+  /* Borders & shadows */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 3px rgba(30, 41, 59, 0.08);
+  --shadow-md: 0 4px 16px rgba(30, 41, 59, 0.1);
+  --shadow-lg: 0 8px 32px rgba(30, 41, 59, 0.12);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* Breakpoints (for reference in media queries) */
+  --bp-tablet: 768px;
+  --bp-desktop: 1024px;
+}
