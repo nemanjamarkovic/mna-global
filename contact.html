@@ -45,11 +45,22 @@
 
           <div class="reveal reveal-delay-1">
             <h2 class="section-title" style="font-size: 1.5rem; margin-bottom: 1.5rem;">Send Us Your Requirement</h2>
-            <!-- UI-only form — wire to backend later -->
             <form class="quote-form card" action="#" method="post" novalidate>
+              <div class="form-honeypot" aria-hidden="true">
+                <label for="botcheck">Leave empty</label>
+                <input type="text" id="botcheck" name="botcheck" tabindex="-1" autocomplete="off">
+              </div>
               <div class="form-group">
-                <label for="product">Product</label>
-                <input type="text" id="product" name="product" placeholder="e.g. Agricultural Grade Urea">
+                <label for="name">Name <span class="form-required">*</span></label>
+                <input type="text" id="name" name="name" placeholder="Your full name" required autocomplete="name">
+              </div>
+              <div class="form-group">
+                <label for="email">Email <span class="form-required">*</span></label>
+                <input type="email" id="email" name="email" placeholder="you@company.com" required autocomplete="email">
+              </div>
+              <div class="form-group">
+                <label for="product">Product <span class="form-required">*</span></label>
+                <input type="text" id="product" name="product" placeholder="e.g. Agricultural Grade Urea" required>
               </div>
               <div class="form-group">
                 <label for="quantity">Quantity</label>
@@ -87,11 +98,11 @@
                 <label for="message">Additional Details</label>
                 <textarea id="message" name="message" placeholder="Any additional requirements or questions"></textarea>
               </div>
-              <p class="form-note">Form submission is not yet connected. This is a UI preview only.</p>
-              <button type="submit" class="btn btn--primary">Request a Quote</button>
-              <p class="form-submit-notice" hidden tabindex="-1" style="color: var(--color-accent-dark); font-weight: 600; margin-top: 1rem;">
-                Thank you — your request has been recorded locally. Form backend will be connected in a future update.
+              <button type="submit" class="btn btn--primary quote-form__submit">Request a Quote</button>
+              <p class="form-submit-notice" hidden tabindex="-1" role="status">
+                Thank you — your quote request has been sent. Our trading team will review your requirement and get back to you.
               </p>
+              <p class="form-error-notice form-submit-notice--error" hidden tabindex="-1" role="alert"></p>
             </form>
           </div>
         </div>
@@ -100,6 +111,7 @@
   </main>
 
   <div id="site-footer"></div>
+  <script src="js/form-config.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

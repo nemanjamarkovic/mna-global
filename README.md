@@ -34,6 +34,7 @@ npx serve .
 ├── products/               Product pages (8 products + index)
 ├── partials/               Shared header & footer
 ├── css/                    Stylesheets (design tokens in variables.css)
+├── js/form-config.js       Web3Forms access key (contact form)
 ├── js/main.js              Navigation, partials, scroll animations
 └── assets/images/          Drop real images here
 ```
@@ -103,7 +104,45 @@ After:
 - **Colors:** Edit `css/variables.css` — all theme colors are CSS custom properties
 - **Navigation / footer:** Edit `partials/header.html` and `partials/footer.html`
 - **Content:** HTML files contain `<!-- CONTENT: ... -->` comments marking editable sections
-- **Contact form:** UI-only in v1; wire `contact.html` form to Formspree or a backend when ready
+- **Contact form:** Configured via Web3Forms — see Contact Form Setup below
+
+## Contact Form Setup
+
+The quote form on `contact.html` sends emails through [Web3Forms](https://web3forms.com/) (works with GitHub Pages).
+
+### One-time setup
+
+1. Go to [web3forms.com](https://web3forms.com/) and create a free account
+2. Create an access key linked to **nemanja_markovic198@hotmail.com**
+3. In Web3Forms settings, restrict allowed domains to:
+   - `mnaglobal.rs`
+   - `www.mnaglobal.rs`
+   - Your GitHub Pages URL (e.g. `nemanjamarkovic.github.io`)
+   - `localhost` (for local testing)
+4. Copy your access key into [`js/form-config.js`](js/form-config.js):
+
+```js
+window.MNA_FORM_CONFIG = {
+  accessKey: "paste-your-key-here",
+  recipientLabel: "nemanja_markovic198@hotmail.com",
+  subject: "MNA Global Trading — New Quote Request",
+};
+```
+
+5. Commit and push to GitHub Pages
+
+### Testing
+
+1. Run locally: `python -m http.server 8080`
+2. Open [http://localhost:8080/contact.html](http://localhost:8080/contact.html)
+3. Fill in Name, Email, Product (required) and submit
+4. Check **nemanja_markovic198@hotmail.com** for the quote email
+
+### Notes
+
+- The access key is visible in frontend JavaScript — this is normal for static sites. Use Web3Forms domain restrictions to prevent abuse.
+- Required fields: Name, Email, Product
+- All other quote fields (quantity, specification, origin, etc.) are included in the email when provided
 
 ## Design
 

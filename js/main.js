@@ -156,17 +156,130 @@
     });
   }
 
-  /** Contact form UI-only handler */
+  /** Contact form — Web3Forms email delivery */
   function initContactForm() {
     const form = document.querySelector(".quote-form");
     if (!form) return;
 
-    form.addEventListener("submit", function (e) {
+    const config = window.MNA_FORM_CONFIG || {};
+    const submitBtn = form.querySelector(".quote-form__submit");
+    const successNotice = form.querySelector(".form-submit-notice");
+    const errorNotice = form.querySelector(".form-error-notice");
+    const defaultBtnText = submitBtn ? submitBtn.textContent : "Request a Quote";
+
+    function hideNotices() {
+      if (successNotice) successNotice.hidden = true;
+      if (errorNotice) {
+        errorNotice.hidden = true;
+        errorNotice.textContent = "";
+      }
+    }
+
+    function showError(message) {
+      hideNotices();
+      if (errorNotice) {
+        errorNotice.textContent = message;
+        errorNotice.hidden = false;
+        errorNotice.focus();
+      }
+    }
+
+    function showSuccess() {
+      hideNotices();
+      if (successNotice) {
+        successNotice.hidden = false;
+        successNotice.focus();
+      }
+    }
+
+    function setLoading(isLoading) {
+      if (!submitBtn) return;
+      submitBtn.disabled = isLoading;
+      submitBtn.classList.toggle("is-loading", isLoading);
+      submitBtn.textContent = isLoading ? "Sending…" : defaultBtnText;
+    }
+
+    function isValidEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    }
+
+    form.addEventListener("submit", async function (e) {
       e.preventDefault();
-      const notice = form.querySelector(".form-submit-notice");
-      if (notice) {
-        notice.hidden = false;
-        notice.focus();
+      hideNotices();
+
+      const honeypot = form.querySelector('[name="botcheck"]');
+      if (honeypot && honeypot.value.trim()) {
+        return;
+      }
+
+      const name = form.querySelector('[name="name"]').value.trim();
+      const email = form.querySelector('[name="email"]').value.trim();
+      const product = form.querySelector('[name="product"]').value.trim();
+
+      if (!name) {
+        showError("Please enter your name.");
+        form.querySelector('[name="name"]').focus();
+        return;
+      }
+
+      if (!email || !isValidEmail(email)) {
+        showError("Please enter a valid email address.");
+        form.querySelector('[name="email"]').focus();
+        return;
+      }
+
+      if (!product) {
+        showError("Please enter the product you are interested in.");
+        form.querySelector('[name="product"]').focus();
+        return;
+      }
+
+      if (!config.accessKey || config.accessKey === "YOUR_ACCESS_KEY_HERE") {
+        showError(
+          "Form is not configured yet. Add your Web3Forms access key in js/form-config.js."
+        );
+        return;
+      }
+
+      const payload = {
+        access_key: config.accessKey,
+        subject: config.subject || "MNA Global Trading — New Quote Request",
+        from_name: name,
+        email: email,
+        product: product,
+        quantity: form.querySelector('[name="quantity"]').value.trim(),
+        specification: form.querySelector('[name="specification"]').value.trim(),
+        origin: form.querySelector('[name="origin"]').value.trim(),
+        destination: form.querySelector('[name="destination"]').value.trim(),
+        delivery_period: form.querySelector('[name="delivery_period"]').value.trim(),
+        incoterm: form.querySelector('[name="incoterm"]').value,
+        message: form.querySelector('[name="message"]').value.trim(),
+      };
+
+      setLoading(true);
+
+      try {
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          form.reset();
+          showSuccess();
+        } else {
+          showError(result.message || "Something went wrong. Please try again later.");
+        }
+      } catch (err) {
+        showError("Unable to send your request. Please check your connection and try again.");
+      } finally {
+        setLoading(false);
       }
     });
   }
