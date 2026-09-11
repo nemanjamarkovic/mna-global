@@ -40,22 +40,22 @@
 
   /** Highlight active nav link based on current page */
   function setActiveNav() {
-    const path = window.location.pathname.replace(/\\/g, "/");
-    const page = path.split("/").pop() || "index.html";
+    const path = window.location.pathname.replace(/\\/g, "/").replace(/\/$/, "");
+    const page = path.split("/").pop() || "index";
+    const pageName = page.replace(/\.html$/, "");
     const navMap = {
-      "index.html": "home",
-      "about.html": "about",
-      "markets.html": "markets",
-      "trading-supply.html": "trading",
-      "logistics.html": "logistics",
-      "quality-compliance.html": "quality",
-      "contact.html": "contact",
-      "index.html-products": "products",
+      index: "home",
+      about: "about",
+      markets: "markets",
+      "trading-supply": "trading",
+      logistics: "logistics",
+      "quality-compliance": "quality",
+      contact: "contact",
     };
 
-    let activeKey = navMap[page] || null;
-    if (path.includes("/products/")) {
-      activeKey = page === "index.html" ? "products" : null;
+    let activeKey = navMap[pageName] || null;
+    if (path.includes("/products")) {
+      activeKey = pageName === "index" || pageName === "products" ? "products" : null;
     }
 
     document.querySelectorAll("[data-nav]").forEach(function (link) {
