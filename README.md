@@ -61,7 +61,7 @@ npx serve .
 
 ## Adding Images
 
-Place image files in `assets/images/`. Each placeholder has a `data-src` attribute showing the intended filename.
+Product images live in `images/` at the project root. Other page images can go in `assets/images/`.
 
 **Example — replace a placeholder:**
 
@@ -89,14 +89,14 @@ After:
 | `logistics.jpg` | Logistics page |
 | `quality-compliance.jpg` | Quality page |
 | `trading-process.jpg` | Trading & Supply page |
-| `product-automotive-urea.jpg` | Automotive urea |
-| `product-urea.jpg` | Agricultural urea |
-| `product-npk.jpg` | NPK |
-| `product-map.jpg` | MAP |
-| `product-dap.jpg` | DAP |
-| `product-sulfur.jpg` | Sulfur |
-| `product-meg.jpg` | MEG |
-| `product-base-oils.jpg` | Base oils |
+| `automotive-grade-urea.jpeg` | Automotive urea |
+| `agro-urea.jpeg` | Agricultural urea |
+| `NPK.jpeg` | NPK |
+| `MAP.jpeg` | MAP |
+| `DAP.jpeg` | DAP |
+| *(not yet added)* | Sulfur |
+| `MEG.jpeg` | MEG |
+| `base-oil.jpeg` | Base oils |
 
 ## Customization
 

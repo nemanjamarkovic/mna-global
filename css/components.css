@@ -277,6 +277,25 @@
   margin-bottom: var(--space-sm);
 }
 
+/* Real images */
+.site-image {
+  width: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  display: block;
+}
+
+.site-image--square {
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-md);
+}
+
+.site-image--hero {
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+}
+
 /* CTA banner */
 .cta-banner {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
