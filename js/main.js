@@ -1,7 +1,9 @@
 (function () {
   "use strict";
 
-  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const prefersReducedMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
 
   /** Resolve base path for partials and links when pages live in subfolders */
   function getBasePath() {
@@ -16,6 +18,24 @@
   function fixRelativeLinks(container, basePath) {
     container.querySelectorAll("[data-root-href]").forEach(function (el) {
       el.setAttribute("href", basePath + el.getAttribute("data-root-href"));
+    });
+  }
+
+  /** Strip .html from internal links for clean URLs */
+  function cleanHref(href) {
+    if (!href || /^(https?:|#|mailto:|tel:)/.test(href)) return href;
+    return href
+      .replace(/(^|\/)index\.html(?=$|[?#])/, "$1")
+      .replace(/\.html(?=$|[?#])/, "");
+  }
+
+  function cleanInternalLinks(root) {
+    root.querySelectorAll("a[href]").forEach(function (link) {
+      const href = link.getAttribute("href");
+      const cleaned = cleanHref(href);
+      if (cleaned !== href) {
+        link.setAttribute("href", cleaned);
+      }
     });
   }
 
@@ -40,7 +60,9 @@
 
   /** Highlight active nav link based on current page */
   function setActiveNav() {
-    const path = window.location.pathname.replace(/\\/g, "/").replace(/\/$/, "");
+    const path = window.location.pathname
+      .replace(/\\/g, "/")
+      .replace(/\/$/, "");
     const page = path.split("/").pop() || "index";
     const pageName = page.replace(/\.html$/, "");
     const navMap = {
@@ -55,7 +77,8 @@
 
     let activeKey = navMap[pageName] || null;
     if (path.includes("/products")) {
-      activeKey = pageName === "index" || pageName === "products" ? "products" : null;
+      activeKey =
+        pageName === "index" || pageName === "products" ? "products" : null;
     }
 
     document.querySelectorAll("[data-nav]").forEach(function (link) {
@@ -107,7 +130,9 @@
       mobileNav.hidden = !isOpen;
     });
 
-    const accordionToggle = mobileNav.querySelector(".mobile-nav__accordion-toggle");
+    const accordionToggle = mobileNav.querySelector(
+      ".mobile-nav__accordion-toggle",
+    );
     const submenu = mobileNav.querySelector(".mobile-nav__submenu");
     if (accordionToggle && submenu) {
       accordionToggle.addEventListener("click", function () {
@@ -148,7 +173,7 @@
           }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" }
+      { threshold: 0.1, rootMargin: "0px 0px -40px 0px" },
     );
 
     elements.forEach(function (el) {
@@ -165,7 +190,9 @@
     const submitBtn = form.querySelector(".quote-form__submit");
     const successNotice = form.querySelector(".form-submit-notice");
     const errorNotice = form.querySelector(".form-error-notice");
-    const defaultBtnText = submitBtn ? submitBtn.textContent : "Request a Quote";
+    const defaultBtnText = submitBtn
+      ? submitBtn.textContent
+      : "Request a Quote";
 
     function hideNotices() {
       if (successNotice) successNotice.hidden = true;
@@ -236,7 +263,7 @@
 
       if (!config.accessKey || config.accessKey === "YOUR_ACCESS_KEY_HERE") {
         showError(
-          "Form is not configured yet. Add your Web3Forms access key in js/form-config.js."
+          "Form is not configured yet. Add your Web3Forms access key in js/form-config.js.",
         );
         return;
       }
@@ -248,10 +275,14 @@
         email: email,
         product: product,
         quantity: form.querySelector('[name="quantity"]').value.trim(),
-        specification: form.querySelector('[name="specification"]').value.trim(),
+        specification: form
+          .querySelector('[name="specification"]')
+          .value.trim(),
         origin: form.querySelector('[name="origin"]').value.trim(),
         destination: form.querySelector('[name="destination"]').value.trim(),
-        delivery_period: form.querySelector('[name="delivery_period"]').value.trim(),
+        delivery_period: form
+          .querySelector('[name="delivery_period"]')
+          .value.trim(),
         incoterm: form.querySelector('[name="incoterm"]').value,
         message: form.querySelector('[name="message"]').value.trim(),
       };
@@ -274,10 +305,14 @@
           form.reset();
           showSuccess();
         } else {
-          showError(result.message || "Something went wrong. Please try again later.");
+          showError(
+            result.message || "Something went wrong. Please try again later.",
+          );
         }
       } catch (err) {
-        showError("Unable to send your request. Please check your connection and try again.");
+        showError(
+          "Unable to send your request. Please check your connection and try again.",
+        );
       } finally {
         setLoading(false);
       }
@@ -290,6 +325,7 @@
       loadPartial("site-footer", "partials/footer.html"),
     ]);
 
+    cleanInternalLinks(document);
     setActiveNav();
     initDropdown();
     initMobileNav();
