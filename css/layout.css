@@ -17,14 +17,16 @@
 }
 
 .site-logo {
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  color: var(--color-primary-dark);
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
-.site-logo span {
-  color: var(--color-accent);
+.site-logo__img {
+  display: block;
+  height: 72px;
+  width: auto;
+  max-width: min(200px, 42vw);
 }
 
 .site-nav {
