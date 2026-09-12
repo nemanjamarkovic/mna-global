@@ -5,10 +5,16 @@
     "(prefers-reduced-motion: reduce)",
   ).matches;
 
+  /** Site root — supports custom domain and GitHub Pages project path */
+  function getSiteRoot() {
+    const path = window.location.pathname.replace(/\\/g, "/");
+    return path.includes("/mna-global") ? "/mna-global/" : "/";
+  }
+
   /** Resolve base path for partials and links when pages live in subfolders */
   function getBasePath() {
     const path = window.location.pathname.replace(/\\/g, "/");
-    if (path.includes("/products/")) {
+    if (/\/products(\/|$)/.test(path)) {
       return "../";
     }
     return "./";
@@ -16,11 +22,12 @@
 
   /** Fix relative hrefs and image src after partial injection */
   function fixRelativeLinks(container, basePath) {
+    const siteRoot = getSiteRoot();
     container.querySelectorAll("[data-root-href]").forEach(function (el) {
       el.setAttribute("href", basePath + el.getAttribute("data-root-href"));
     });
     container.querySelectorAll("[data-root-src]").forEach(function (el) {
-      el.setAttribute("src", basePath + el.getAttribute("data-root-src"));
+      el.setAttribute("src", siteRoot + el.getAttribute("data-root-src"));
     });
   }
 
