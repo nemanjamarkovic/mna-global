@@ -14,10 +14,13 @@
     return "./";
   }
 
-  /** Fix relative hrefs after partial injection */
+  /** Fix relative hrefs and image src after partial injection */
   function fixRelativeLinks(container, basePath) {
     container.querySelectorAll("[data-root-href]").forEach(function (el) {
       el.setAttribute("href", basePath + el.getAttribute("data-root-href"));
+    });
+    container.querySelectorAll("[data-root-src]").forEach(function (el) {
+      el.setAttribute("src", basePath + el.getAttribute("data-root-src"));
     });
   }
 
