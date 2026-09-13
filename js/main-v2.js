@@ -191,18 +191,18 @@
     });
   }
 
-  /** Contact form — Web3Forms email delivery */
+  /** Contact form — cPanel PHP mail delivery */
   function initContactForm() {
     const form = document.querySelector(".quote-form");
     if (!form) return;
 
-    const config = window.MNA_FORM_CONFIG || {};
     const submitBtn = form.querySelector(".quote-form__submit");
     const successNotice = form.querySelector(".form-submit-notice");
     const errorNotice = form.querySelector(".form-error-notice");
     const defaultBtnText = submitBtn
       ? submitBtn.textContent
       : "Request a Quote";
+    const isPreviewHost = window.location.hostname.includes("github.io");
 
     function hideNotices() {
       if (successNotice) successNotice.hidden = true;
@@ -240,6 +240,16 @@
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     }
 
+    if (isPreviewHost) {
+      showError(
+        "Quote requests can only be sent from mnaglobal.rs/contact. Please visit the live site to contact us.",
+      );
+      if (submitBtn) {
+        submitBtn.disabled = true;
+      }
+      return;
+    }
+
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
       hideNotices();
@@ -271,17 +281,8 @@
         return;
       }
 
-      if (!config.accessKey || config.accessKey === "YOUR_ACCESS_KEY_HERE") {
-        showError(
-          "Form is not configured yet. Add your Web3Forms access key in js/form-config.js.",
-        );
-        return;
-      }
-
       const payload = {
-        access_key: config.accessKey,
-        subject: config.subject || "MNA Global Trading — New Quote Request",
-        from_name: name,
+        name: name,
         email: email,
         product: product,
         quantity: form.querySelector('[name="quantity"]').value.trim(),
@@ -295,12 +296,13 @@
           .value.trim(),
         incoterm: form.querySelector('[name="incoterm"]').value,
         message: form.querySelector('[name="message"]').value.trim(),
+        botcheck: honeypot ? honeypot.value.trim() : "",
       };
 
       setLoading(true);
 
       try {
-        const response = await fetch("https://api.web3forms.com/submit", {
+        const response = await fetch(getSiteRoot() + "php/send-quote.php", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

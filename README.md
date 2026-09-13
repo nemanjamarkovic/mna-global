@@ -34,8 +34,10 @@ npx serve .
 ├── products/               Product pages (8 products + index)
 ├── partials/               Shared header & footer
 ├── css/                    Stylesheets (design tokens in variables.css)
-├── js/form-config.js       Web3Forms access key (contact form)
+├── js/form-config.js       Contact form endpoint note
 ├── js/main.js              Navigation, partials, scroll animations
+├── php/send-quote.php      Contact form mail handler (cPanel only)
+├── php/mail-config.php     Mail settings (create on server, not in git)
 └── assets/images/          Drop real images here
 ```
 
@@ -104,45 +106,45 @@ After:
 - **Colors:** Edit `css/variables.css` — all theme colors are CSS custom properties
 - **Navigation / footer:** Edit `partials/header.html` and `partials/footer.html`
 - **Content:** HTML files contain `<!-- CONTENT: ... -->` comments marking editable sections
-- **Contact form:** Configured via Web3Forms — see Contact Form Setup below
+- **Contact form:** Sends email via PHP on cPanel (`mnaglobal.rs`) — see Contact Form Setup below
 
 ## Contact Form Setup
 
-The quote form on `contact.html` sends emails through [Web3Forms](https://web3forms.com/) (works with GitHub Pages).
+The quote form on `contact.html` sends emails through a PHP script on **oblak+ cPanel**. It does **not** work on GitHub Pages (preview only shows a message to use the live site).
 
-### One-time setup
+### One-time cPanel setup
 
-1. Go to [web3forms.com](https://web3forms.com/) and create a free account
-2. Create an access key linked to **nemanja_markovic198@hotmail.com**
-3. In Web3Forms settings, restrict allowed domains to:
-   - `mnaglobal.rs`
-   - `www.mnaglobal.rs`
-   - Your GitHub Pages URL (e.g. `nemanjamarkovic.github.io`)
-   - `localhost` (for local testing)
-4. Copy your access key into [`js/form-config.js`](js/form-config.js):
+1. cPanel → **Email Accounts** → create a domain mailbox (e.g. `info@mnaglobal.rs`)
+2. Copy [`php/mail-config.example.php`](php/mail-config.example.php) to `php/mail-config.php` on the server
+3. Edit `mail-config.php` with your addresses:
 
-```js
-window.MNA_FORM_CONFIG = {
-  accessKey: "paste-your-key-here",
-  recipientLabel: "nemanja_markovic198@hotmail.com",
-  subject: "MNA Global Trading — New Quote Request",
-};
+```php
+return [
+    "to_email" => "info@mnaglobal.rs",
+    "from_email" => "noreply@mnaglobal.rs",
+    "from_name" => "MNA Global Trading",
+    "subject_prefix" => "MNA Global Trading — New Quote Request",
+];
 ```
 
-5. Commit and push to GitHub Pages
+4. Upload to `public_html/php/`:
+   - `send-quote.php`
+   - `mail-config.php` (your copy — do not commit to git)
+5. Upload updated `js/main-v2.js` (or `js/main.js` if not using v2)
 
 ### Testing
 
-1. Run locally: `python -m http.server 8080`
-2. Open [http://localhost:8080/contact.html](http://localhost:8080/contact.html)
-3. Fill in Name, Email, Product (required) and submit
-4. Check **nemanja_markovic198@hotmail.com** for the quote email
+1. Open [https://mnaglobal.rs/contact](https://mnaglobal.rs/contact)
+2. Fill in Name, Email, Product (required) and submit
+3. Check the inbox configured in `mail-config.php` (and spam folder on first send)
+4. Reply to the email — it should go to the visitor via `Reply-To`
 
 ### Notes
 
-- The access key is visible in frontend JavaScript — this is normal for static sites. Use Web3Forms domain restrictions to prevent abuse.
 - Required fields: Name, Email, Product
-- All other quote fields (quantity, specification, origin, etc.) are included in the email when provided
+- All other quote fields are included in the email when provided
+- GitHub Pages preview disables the submit button and shows a message to use the live site
+- If emails land in spam, ask oblak+ to verify SPF/DKIM for `mnaglobal.rs`, or switch the PHP script to SMTP later
 
 ## Design
 
