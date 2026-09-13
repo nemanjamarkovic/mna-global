@@ -120,17 +120,22 @@ The quote form on `contact.html` sends emails through a PHP script on **oblak+ c
 
 ```php
 return [
-    "to_email" => "info@mnaglobal.rs",
+    "to_emails" => [
+        "info@mnaglobal.rs",
+        "sales@mnaglobal.rs",
+    ],
     "from_email" => "noreply@mnaglobal.rs",
     "from_name" => "MNA Global Trading",
     "subject_prefix" => "MNA Global Trading — New Quote Request",
 ];
 ```
 
+For a single recipient, you can use `"to_email" => "info@mnaglobal.rs"` instead of `to_emails`.
+
 4. Upload to `public_html/php/`:
    - `send-quote.php`
    - `mail-config.php` (your copy — do not commit to git)
-5. Upload updated `js/main-v2.js` (or `js/main.js` if not using v2)
+5. Upload updated `js/main-v3.js` and HTML pages that reference it
 
 ### Testing
 

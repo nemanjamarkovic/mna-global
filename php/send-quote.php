@@ -44,6 +44,27 @@ function respond(bool $success, string $message, int $status = 200): void
     exit;
 }
 
+function normalizeRecipients(array $config): array
+{
+    $recipients = [];
+
+    if (isset($config["to_emails"]) && is_array($config["to_emails"])) {
+        $recipients = $config["to_emails"];
+    } elseif (!empty($config["to_email"])) {
+        $recipients = [(string) $config["to_email"]];
+    }
+
+    $valid = [];
+    foreach ($recipients as $recipient) {
+        $email = trim((string) $recipient);
+        if ($email !== "" && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $valid[] = $email;
+        }
+    }
+
+    return array_values(array_unique($valid));
+}
+
 if (field($input, "botcheck") !== "") {
     respond(true, "Thank you.");
 }
@@ -72,12 +93,12 @@ $deliveryPeriod = field($input, "delivery_period");
 $incoterm = field($input, "incoterm");
 $message = field($input, "message");
 
-$toEmail = (string) ($config["to_email"] ?? "");
+$toEmails = normalizeRecipients($config);
 $fromEmail = (string) ($config["from_email"] ?? "");
 $fromName = (string) ($config["from_name"] ?? "MNA Global Trading");
 $subjectPrefix = (string) ($config["subject_prefix"] ?? "New Quote Request");
 
-if ($toEmail === "" || $fromEmail === "") {
+if ($toEmails === [] || $fromEmail === "") {
     respond(false, "Mail is not configured on the server.", 500);
 }
 
@@ -113,7 +134,7 @@ $headers = [
     "X-Mailer: PHP/" . phpversion(),
 ];
 
-$sent = mail($toEmail, $subject, $body, implode("\r\n", $headers));
+$sent = mail(implode(", ", $toEmails), $subject, $body, implode("\r\n", $headers));
 
 if (!$sent) {
     respond(false, "Unable to send your request. Please try again later.", 500);
