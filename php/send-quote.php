@@ -44,6 +44,128 @@ function respond(bool $success, string $message, int $status = 200): void
     exit;
 }
 
+function escapeHtml(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8");
+}
+
+function displayField(string $value): string
+{
+    return $value !== "" ? escapeHtml($value) : "&#8212;";
+}
+
+function buildPlainBody(
+    string $name,
+    string $email,
+    string $product,
+    string $quantity,
+    string $specification,
+    string $origin,
+    string $destination,
+    string $deliveryPeriod,
+    string $incoterm,
+    string $message
+): string {
+    $lines = [
+        "New quote request from the MNA Global Trading website",
+        "",
+        "Name: " . $name,
+        "Email: " . $email,
+        "Product: " . $product,
+        "Quantity: " . ($quantity !== "" ? $quantity : "—"),
+        "Specification: " . ($specification !== "" ? $specification : "—"),
+        "Origin: " . ($origin !== "" ? $origin : "—"),
+        "Destination: " . ($destination !== "" ? $destination : "—"),
+        "Delivery Period: " . ($deliveryPeriod !== "" ? $deliveryPeriod : "—"),
+        "Incoterm: " . ($incoterm !== "" ? $incoterm : "—"),
+        "",
+        "Additional Details:",
+        $message !== "" ? $message : "—",
+        "",
+        "Submitted: " . gmdate("Y-m-d H:i:s") . " UTC",
+    ];
+
+    return implode("\r\n", $lines);
+}
+
+function buildHtmlBody(
+    string $name,
+    string $email,
+    string $product,
+    string $quantity,
+    string $specification,
+    string $origin,
+    string $destination,
+    string $deliveryPeriod,
+    string $incoterm,
+    string $message
+): string {
+    $rows = [
+        ["Name", displayField($name)],
+        ["Email", '<a href="mailto:' . escapeHtml($email) . '" style="color:#2d6a8a;text-decoration:none;">' . escapeHtml($email) . "</a>"],
+        ["Product", displayField($product)],
+        ["Quantity", displayField($quantity)],
+        ["Specification", displayField($specification)],
+        ["Origin", displayField($origin)],
+        ["Destination", displayField($destination)],
+        ["Delivery Period", displayField($deliveryPeriod)],
+        ["Incoterm", displayField($incoterm)],
+    ];
+
+    $rowHtml = "";
+    foreach ($rows as [$label, $value]) {
+        $rowHtml .= '
+          <tr>
+            <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#64748b;font-size:14px;width:160px;vertical-align:top;">' . escapeHtml($label) . '</td>
+            <td style="padding:10px 12px;border-bottom:1px solid #e2e8f0;color:#1e293b;font-size:14px;vertical-align:top;">' . $value . '</td>
+          </tr>';
+    }
+
+    $messageHtml = nl2br(displayField($message));
+
+    return '<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Quote Request</title>
+</head>
+<body style="margin:0;padding:0;background:#f8fafc;font-family:Segoe UI,system-ui,-apple-system,BlinkMacSystemFont,sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f8fafc;padding:24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:640px;background:#ffffff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+          <tr>
+            <td style="background:linear-gradient(180deg,#e8f4fc 0%,#ffffff 100%);padding:24px 28px;border-bottom:1px solid #e2e8f0;">
+              <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#4caf50;">MNA Global Trading</p>
+              <h1 style="margin:0;font-size:24px;line-height:1.3;color:#2d6a8a;">New Quote Request</h1>
+              <p style="margin:10px 0 0;font-size:14px;color:#64748b;">A new inquiry was submitted from the website contact form.</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0 0;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">' . $rowHtml . '</table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 28px 8px;">
+              <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#4caf50;">Additional Details</p>
+              <div style="padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;color:#1e293b;font-size:14px;line-height:1.6;">' . $messageHtml . '</div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:8px 28px 24px;">
+              <p style="margin:0;font-size:12px;color:#64748b;">Submitted: ' . escapeHtml(gmdate("Y-m-d H:i:s")) . ' UTC</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>';
+}
+
 function normalizeRecipients(array $config): array
 {
     $recipients = [];
@@ -104,35 +226,52 @@ if ($toEmails === [] || $fromEmail === "") {
 
 $subject = $subjectPrefix . " — " . $product;
 
-$bodyLines = [
-    "New quote request from the MNA Global Trading website",
-    "",
-    "Name: " . $name,
-    "Email: " . $email,
-    "Product: " . $product,
-    "Quantity: " . ($quantity !== "" ? $quantity : "—"),
-    "Specification: " . ($specification !== "" ? $specification : "—"),
-    "Origin: " . ($origin !== "" ? $origin : "—"),
-    "Destination: " . ($destination !== "" ? $destination : "—"),
-    "Delivery Period: " . ($deliveryPeriod !== "" ? $deliveryPeriod : "—"),
-    "Incoterm: " . ($incoterm !== "" ? $incoterm : "—"),
-    "",
-    "Additional Details:",
-    $message !== "" ? $message : "—",
-    "",
-    "Submitted: " . gmdate("Y-m-d H:i:s") . " UTC",
-];
+$plainBody = buildPlainBody(
+    $name,
+    $email,
+    $product,
+    $quantity,
+    $specification,
+    $origin,
+    $destination,
+    $deliveryPeriod,
+    $incoterm,
+    $message
+);
 
-$body = implode("\r\n", $bodyLines);
+$htmlBody = buildHtmlBody(
+    $name,
+    $email,
+    $product,
+    $quantity,
+    $specification,
+    $origin,
+    $destination,
+    $deliveryPeriod,
+    $incoterm,
+    $message
+);
 
+$boundary = "mna-quote-" . md5(uniqid("", true));
 $encodedFromName = "=?UTF-8?B?" . base64_encode($fromName) . "?=";
+
 $headers = [
     "MIME-Version: 1.0",
-    "Content-Type: text/plain; charset=UTF-8",
+    'Content-Type: multipart/alternative; boundary="' . $boundary . '"',
     "From: " . $encodedFromName . " <" . $fromEmail . ">",
     "Reply-To: " . $name . " <" . $email . ">",
     "X-Mailer: PHP/" . phpversion(),
 ];
+
+$body = "--" . $boundary . "\r\n"
+    . "Content-Type: text/plain; charset=UTF-8\r\n"
+    . "Content-Transfer-Encoding: 8bit\r\n\r\n"
+    . $plainBody . "\r\n\r\n"
+    . "--" . $boundary . "\r\n"
+    . "Content-Type: text/html; charset=UTF-8\r\n"
+    . "Content-Transfer-Encoding: 8bit\r\n\r\n"
+    . $htmlBody . "\r\n\r\n"
+    . "--" . $boundary . "--";
 
 $sent = mail(implode(", ", $toEmails), $subject, $body, implode("\r\n", $headers));
 
